@@ -93,7 +93,7 @@
     - name: Test | Run role analysis
       ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
-        __leapp_test_rolename: infra.leapp.analysis
+        __leapp_test_rolename: analysis
         leapp_workdir_controller: "{{ workdir_controller_tempfile.path }}"
 
     - name: Test | Validate hostvars file

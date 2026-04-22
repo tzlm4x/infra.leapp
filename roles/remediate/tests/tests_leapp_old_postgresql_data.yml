@@ -36,7 +36,7 @@
 
     - name: Test | Run leapp_old_postgresql_data remediation
       ansible.builtin.include_role:
-        name: infra.leapp.remediate
+        name: remediate
         tasks_from: leapp_old_postgresql_data
 
     - name: Test | Get /var/lib/pgsql/data stat

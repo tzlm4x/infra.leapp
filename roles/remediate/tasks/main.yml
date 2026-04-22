@@ -2,7 +2,7 @@
 # tasks file for remediations
 - name: Ensure ansible_facts used by role
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: set_facts.yml
   vars:
     __leapp_role_required_facts: "{{ __leapp_remediate_required_facts }}"

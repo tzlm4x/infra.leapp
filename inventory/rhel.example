@@ -1,0 +1,23 @@
+[rhel7]
+10.0.0.10
+
+[rhel8]
+10.0.0.20
+
+[rhel9]
+10.0.0.30
+
+[all:children]
+rhel7
+rhel8
+rhel9
+
+[all:vars]
+ansible_user=CHANGE_ME
+ansible_password=CHANGE_ME
+ansible_become=true
+ansible_become_method=sudo
+ansible_become_password=CHANGE_ME
+
+[local]
+localhost ansible_connection=local ansible_become=false ansible_remote_tmp=/tmp/.ansible-local-tmp

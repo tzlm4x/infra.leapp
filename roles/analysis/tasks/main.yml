@@ -1,7 +1,7 @@
 ---
 - name: Ensure ansible_facts used by role
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: set_facts.yml
   vars:
     __leapp_role_required_facts: "{{ __leapp_analysis_required_facts }}"
@@ -16,7 +16,7 @@
 
 - name: Initialize lock, logging, and common vars
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: init_leapp_log.yml
     public: true
   vars:

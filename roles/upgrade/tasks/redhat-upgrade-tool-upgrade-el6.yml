@@ -24,7 +24,7 @@
 
 - name: redhat-upgrade-tool-upgrade-el6 | Register with Satellite activation key
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: register-satellite-el6.yml
   vars:
     satellite_organization: "{{ leapp_satellite_organization }}"
@@ -35,7 +35,7 @@
   vars:
     __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
@@ -67,7 +67,7 @@
 
 - name: redhat-upgrade-tool-upgrade-el6 | Include update-and-reboot.yml
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: update-and-reboot.yml
 
 - name: redhat-upgrade-tool-upgrade-el6 | Get enabled RHEL 6 repositories
@@ -96,7 +96,7 @@
 
 - name: redhat-upgrade-tool-upgrade-el6 | Unload kernel modules before upgrade
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: manage_kernel_modules.yml
   vars:
     leapp_kernel_modules: "{{ leapp_kernel_modules_to_unload_before_upgrade }}"

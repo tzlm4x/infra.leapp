@@ -49,7 +49,7 @@
 
         - name: leapp_btrfs_detected | Unload btrfs kernel module
           ansible.builtin.include_role:
-            name: infra.leapp.common
+            name: common
             tasks_from: manage_kernel_modules.yml
           vars:
             leapp_kernel_modules:

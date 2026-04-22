@@ -1,24 +1,25 @@
 ---
-- name: create_remediation_hostvars | Clear remediation_todo
+- name: create_remediation_hostvars | Compute remediation_todo from leapp report
   ansible.builtin.set_fact:
-    leapp_remediation_todo: []
-
-- name: create_remediation_hostvars | Map inhibitors to remediation_todo
-  ansible.builtin.set_fact:
-    leapp_remediation_todo: "{{ leapp_remediation_todo | default([]) + [todo_item] }}"
-  loop: "{{ leapp_inhibitors | default([]) }}"
-  loop_control:
-    loop_var: inhibitor
-  vars:
-    inhibitor_key: "{{ inhibitor.key | default('') }}"
-    inhibitor_title: "{{ inhibitor.title | default('') }}"
-    todo_item: >-
-      {{ __leapp_inhibitors_key_map[inhibitor_key]
-        if inhibitor_key in __leapp_inhibitors_key_map
-        else __leapp_inhibitors_title_map[inhibitor_title] }}
-  when: >-
-    inhibitor_key in __leapp_inhibitors_key_map
-    or inhibitor_title in __leapp_inhibitors_title_map
+    leapp_remediation_todo: >-
+      {%- set ns = namespace(todo=[]) -%}
+      {%- for entry in leapp_report_json.entries | default([]) -%}
+      {%-   set entry_groups = entry.groups | default([]) -%}
+      {%-   set entry_key = entry.key | default('') -%}
+      {%-   set entry_title = entry.title | default('') -%}
+      {%-   set is_inhibitor =
+              'inhibitor' in entry_groups
+              or 'error' in entry_groups
+              or ((leapp_high_sev_as_inhibitors | default(false, true) | bool) and (entry.severity | default('') == 'high')) -%}
+      {%-   if is_inhibitor -%}
+      {%-     if entry_key in __leapp_inhibitors_key_map -%}
+      {%-       set ns.todo = ns.todo + [__leapp_inhibitors_key_map[entry_key]] -%}
+      {%-     elif entry_title in __leapp_inhibitors_title_map -%}
+      {%-       set ns.todo = ns.todo + [__leapp_inhibitors_title_map[entry_title]] -%}
+      {%-     endif -%}
+      {%-   endif -%}
+      {%- endfor -%}
+      {{ ns.todo | unique | list }}
 
 - name: create_remediation_hostvars | Write host_vars and playbook for remediation
   when: leapp_remediation_todo | default([]) | length > 0
@@ -74,7 +75,7 @@
             tasks:
               - name: Perform remediations on the system
                 ansible.builtin.include_role:
-                  name: infra.leapp.remediate
+                  name: remediate
           ...
         dest: "{{ leapp_workdir_controller }}/remediate.yml"
         mode: "0644"

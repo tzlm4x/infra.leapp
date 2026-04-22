@@ -41,7 +41,7 @@
 
 - name: copy_reports_to_controller | Copy log file to the controller
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: copy_archive_leapp_log.yml
 
 ...

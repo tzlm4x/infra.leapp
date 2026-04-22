@@ -46,7 +46,7 @@
 
         - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
           ansible.builtin.include_role:
-            name: infra.leapp.common
+            name: common
             tasks_from: manage_kernel_modules.yml
           vars:
             leapp_kernel_modules: "{{ leapp_unsupported_modules }}"

@@ -8,11 +8,11 @@
       block:
         - name: Test | Run role analysis
           ansible.builtin.include_role:
-            name: infra.leapp.analysis
+            name: analysis
       always:
         - name: Test | Include cleanup logs
           ansible.builtin.include_role:
-            name: infra.leapp.common
+            name: common
             tasks_from: cleanup_logs.yml
 
 ...

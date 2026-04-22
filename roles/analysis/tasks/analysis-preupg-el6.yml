@@ -9,7 +9,7 @@
 
 - name: analysis-preupg-el6 | Register with Satellite activation key
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: register-satellite-el6.yml
   vars:
     satellite_organization: "{{ leapp_satellite_organization }}"
@@ -20,7 +20,7 @@
   vars:
     __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
@@ -81,7 +81,7 @@
   vars:
     __repos: "{{ leapp_local_repos_post_analysis }}"
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
@@ -89,7 +89,7 @@
 # the original activation key to restore the system to its pre-analysis state.
 - name: analysis-preupg-el6 | Restore original Satellite activation key (RHEL 6)
   ansible.builtin.include_role:
-    name: infra.leapp.common
+    name: common
     tasks_from: register-satellite-el6.yml
   vars:
     satellite_organization: "{{ leapp_satellite_organization }}"

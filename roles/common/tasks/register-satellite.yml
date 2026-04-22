@@ -17,6 +17,7 @@
         keys:
           - "{{ satellite_activation_key }}"
   when:
-    - satellite_organization | length > 0
-    - satellite_activation_key | length > 0
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization | default('', true) | length > 0
+    - satellite_activation_key | default('', true) | length > 0
 ...

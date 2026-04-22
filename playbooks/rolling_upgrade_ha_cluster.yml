@@ -68,7 +68,7 @@
 
     - name: Perform OS upgrade
       ansible.builtin.import_role:
-        name: infra.leapp.upgrade
+        name: upgrade
 
     - name: Start cluster on this node
       ansible.builtin.command:

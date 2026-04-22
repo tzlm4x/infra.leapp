@@ -9,7 +9,7 @@
       block:
         - name: Test | Run role upgrade
           ansible.builtin.include_role:
-            name: infra.leapp.upgrade
+            name: upgrade
       rescue:
         - name: Test | Check error
           ansible.builtin.debug:
@@ -26,7 +26,7 @@
       always:
         - name: Test | Include cleanup logs
           ansible.builtin.include_role:
-            name: infra.leapp.common
+            name: common
             tasks_from: cleanup_logs.yml
 
 ...

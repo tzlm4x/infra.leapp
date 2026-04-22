@@ -2,6 +2,12 @@
 /changelogs/.plugin-cache.yaml
 .vscode/
 
+# Local inventory and generated runtime artifacts
+/inventory/rhel
+/playbooks/host_vars/
+/playbooks/ansible_leapp_analysis_logs_*/
+/playbooks/remediate.yml.*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

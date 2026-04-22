@@ -10,15 +10,15 @@
     satellite_activation_key: "{{ leapp_satellite_activation_key }}"
   when: leapp_upgrade_type == 'satellite'
 
-- name: pre_upgrade_update | Include custom_local_repos for local_repos_pre_leapp
+- name: pre_upgrade_update | Configure local repositories pre-upgrade
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: custom_local_repos
   vars:
     __repos: "{{ leapp_local_repos_pre }}"
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
-- name: pre_upgrade_update | Install leapp packages
+- name: pre_upgrade_update | Install required packages
   ansible.builtin.package:
     name: "{{ __leapp_packages }}"
     enablerepo: >-
