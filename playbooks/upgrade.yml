@@ -1,0 +1,19 @@
+---
+- name: Upgrade
+  hosts: all
+  strategy: free
+  become: true
+  force_handlers: true
+  vars:
+    leapp_upgrade_type: satellite
+    leapp_satellite_organization: My Satellite Organization
+    leapp_satellite_activation_key: MY_ACTIVATION_KEY
+    leapp_satellite_activation_key_post_upgrade: MY_ACTIVATION_KEY_POST_UPGRADE
+    leapp_upgrade_opts: --target 8.10
+    leapp_update_grub_to_grub_2: true
+    leapp_selinux_mode: permissive
+  tasks:
+    - name: Perform OS upgrade
+      ansible.builtin.import_role:
+        name: infra.leapp.upgrade
+...

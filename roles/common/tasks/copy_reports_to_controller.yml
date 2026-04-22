@@ -1,0 +1,47 @@
+---
+# Copies logs to the controller.
+# Logs copied:
+# - /var/log/leapp/leapp-report.txt
+# - /var/log/leapp/leapp-report.json
+# - /var/log/leapp/leapp-preupgrade.log (analysis)
+# - /var/log/leapp/leapp-upgrade.log (upgrade)
+# - /var/log/leapp/ansible_leapp_<job_name>.log
+#
+# This task file requires the following variables to be set:
+# leapp_reports_controller_dir
+# leapp_reports_dir
+# leapp_log_file_basename
+# leapp_log_file
+# leapp_timestamp
+# leapp_report_txt
+# leapp_report_json
+# leapp_native_log
+
+- name: copy_reports_to_controller | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
+- name: copy_reports_to_controller | Ensure reports directory on controller
+  ansible.builtin.file:
+    path: "{{ leapp_reports_controller_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
+  run_once: true
+
+- name: copy_reports_to_controller | Fetch report files if they exist
+  ansible.builtin.include_tasks: fetch_file_if_exists.yml
+  vars:
+    __leapp_report_file: "{{ item }}"
+  loop:
+    - "{{ leapp_report_txt }}"
+    - "{{ leapp_report_json }}"
+    - "{{ leapp_native_log }}"
+
+- name: copy_reports_to_controller | Copy log file to the controller
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: copy_archive_leapp_log.yml
+
+...

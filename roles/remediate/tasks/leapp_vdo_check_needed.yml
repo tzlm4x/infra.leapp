@@ -1,0 +1,12 @@
+---
+- name: leapp_vdo_check_needed | Install vdo package - required for performing the VDO check of block devices
+  when:
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 8
+  block:
+    - name: leapp_vdo_check_needed | Install vdo package
+      ansible.builtin.dnf:
+        name: vdo
+        state: present
+
+...

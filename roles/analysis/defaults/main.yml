@@ -1,0 +1,174 @@
+---
+# defaults file for analysis
+# If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
+# leapp_answerfile: |
+#   [remove_pam_pkcs11_module_check]
+#   confirm = True
+
+leapp_upgrade_type: cdn
+# leapp_upgrade_type: satellite
+# leapp_upgrade_type: rhui
+# leapp_upgrade_type: custom
+
+leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgrade_type == 'custom' else '' }}"
+
+# Satellite Organization and Activation Keys are required if using Satellite to change content views
+# unless the content view already in use has all required repositories.
+leapp_satellite_organization: ""
+# leapp_satellite_activation_key_leapp is deprecated, use leapp_satellite_activation_key instead
+leapp_satellite_activation_key: "{{ leapp_satellite_activation_key_leapp | default('') }}"
+# leapp_satellite_activation_key_pre_leapp is deprecated, use leapp_satellite_activation_key_post_analysis instead
+leapp_satellite_activation_key_post_analysis: "{{ leapp_satellite_activation_key_pre_leapp | default(leapp_satellite_activation_key) }}"
+
+# leapp_repos_enabled:
+#   - satellite-client-6-for-rhel-{{ ansible_facts['distribution_major_version'] | int + 1 }}-x86_64-rpms
+leapp_repos_enabled: []
+
+# Treat all high risk findings as inhibitors, not just those exclusively marked as inhibitors by Leapp
+leapp_high_sev_as_inhibitors: false
+
+# List of keys of known inhibitors which will be excluded when setting upgrade_inhibited and leapp_inhibitors
+# This allows ignoring inhibitors for which remediations are available and require no further attention
+leapp_known_inhibitors: []
+
+# Dict of env vars to be used when the leapp command is run
+leapp_env_vars: {}
+# leapp_env_vars:
+#   LEAPP_UNSUPPORTED: 1
+#   LEAPP_DEVEL_DATABASE_SYNC_OFF: 1
+
+# For leapp_upgrade_type == "custom"
+# Used to configure repos before running leapp analysis / installing leapp packages.
+# local_repos_pre_leapp is deprecated, use leapp_local_repos_pre instead
+# leapp_local_repos_pre: []
+leapp_local_repos_pre: "{{ local_repos_pre_leapp | default([]) }}"
+# leapp_local_repos_pre:
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
+
+# For leapp_upgrade_type == "custom"
+# Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
+# Generated using ansible.builtin.yum_repository.
+# local_repos_leapp is deprecated, use leapp_local_repos instead
+# leapp_local_repos: []
+leapp_local_repos: "{{ local_repos_leapp | default([]) }}"
+# leapp_local_repos:
+#   - name: rhel-8-for-x86_64-baseos-rpms
+#     description: Red Hat 8.10 Base OS
+#     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#   - name: rhel-8-for-x86_64-appstream-rpms
+#     description: Red Hat 8.10 App Stream
+#     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+
+# For leapp_upgrade_type == "custom"
+# Used to return repos to previous state after leapp analysis if necessary.
+# local_repos_post_analysis is deprecated, use leapp_local_repos_post_analysis instead
+# leapp_local_repos_post_analysis: []
+leapp_local_repos_post_analysis: "{{ local_repos_post_analysis | default([]) }}"
+# leapp_local_repos_post_analysis:
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: absent # Defaults to present
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: absent # Defaults to present
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo01.example.com/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
+#   - name: rhel-server-7-rpms
+#     description: Red Hat 7 Server
+#     baseurl: http://repo01.example.com/7Server/rhel-server-7-rpms
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
+
+# os_path is deprecated, use leapp_os_path instead
+# leapp_os_path: $PATH
+leapp_os_path: "{{ os_path | default('$PATH') }}"
+
+# async_timeout_maximum is deprecated, use leapp_async_timeout_maximum instead
+# leapp_async_timeout_maximum: 7200
+leapp_async_timeout_maximum: "{{ async_timeout_maximum | default(7200) }}"
+
+# async_poll_interval is deprecated, use leapp_async_poll_interval instead
+# leapp_async_poll_interval: 60
+leapp_async_poll_interval: "{{ async_poll_interval | default(60) }}"
+
+leapp_bypass_fs_checks: false
+
+# Copy leapp report files (JSON and text) from managed nodes to the controller
+# Reports are stored in a timestamped directory: playbook_dir/leapp_reports_YYYY-MM-DD_HH-MM-SS
+leapp_copy_reports: true
+
+# Create host_vars files and a remediation playbook on the controller
+# Each host gets its own host_vars file with leapp_remediation_todo variable
+# A remediate.yml playbook is created that uses these host variables
+leapp_create_remediation_hostvars: true
+
+# Set which Ansible Collection to use for System Roles.
+# For community/upstream, use 'fedora.linux_system_roles'.
+# For the RHEL, AAP, use 'redhat.rhel_system_roles'
+# infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_system_roles_collection instead
+# leapp_system_roles_collection: fedora.linux_system_roles
+leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
+
+# Directory to store leapp pre-upgrade reports and remediation hostvars
+leapp_workdir_controller: "{{ playbook_dir }}"
+
+# Whether to update all packages to latest version and reboot before running leapp analysis
+leapp_pre_upgrade_update: false
+
+# reboot_timeout is deprecated, use leapp_reboot_timeout instead
+# leapp_reboot_timeout: 7200
+leapp_reboot_timeout: "{{ reboot_timeout | default(7200) }}"
+
+# post_reboot_delay is deprecated, use leapp_post_reboot_delay instead
+# leapp_post_reboot_delay: 120
+leapp_post_reboot_delay: "{{ post_reboot_delay | default(120) }}"
+
+...

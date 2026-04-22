@@ -1,0 +1,20 @@
+---
+- name: update-and-reboot | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
+- name: update-and-reboot | Ensure all updates are applied
+  ansible.builtin.package:
+    name: "*"
+    state: latest # noqa package-latest
+  register: updates_available
+  async: "{{ leapp_async_timeout_maximum | int }}"
+  poll: "{{ leapp_async_poll_interval | int }}"
+
+- name: update-and-reboot | Reboot when updates applied
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
+  when: updates_available.changed # noqa: no-handler
+
+...

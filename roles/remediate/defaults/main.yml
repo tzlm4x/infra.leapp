@@ -1,0 +1,42 @@
+---
+# defaults file for remediations
+
+# reboot_timeout is deprecated, use leapp_reboot_timeout instead
+# leapp_reboot_timeout: 7200
+leapp_reboot_timeout: "{{ reboot_timeout | default(7200) }}"
+
+# pre_reboot_delay is deprecated, use leapp_pre_reboot_delay instead
+# leapp_pre_reboot_delay: 60
+leapp_pre_reboot_delay: "{{ pre_reboot_delay | default(60) }}"
+
+# post_reboot_delay is deprecated, use leapp_post_reboot_delay instead
+# leapp_post_reboot_delay: 120
+leapp_post_reboot_delay: "{{ post_reboot_delay | default(120) }}"
+
+leapp_report_location: /var/log/leapp/leapp-report.json
+
+# remediation_playbooks is deprecated, use leapp_remediation_playbooks instead
+# using relative path assumes the variable will be evaluated in the context of a role
+# tasks file in the tasks directory, which is also where the leapp_*.yml files are located
+default_leapp_remediation_playbooks: "{{
+  q('fileglob', 'leapp_*.yml') | map('basename') | map('regex_replace', '[.]yml$', '') | list }}"
+leapp_remediation_playbooks: "{{ remediation_playbooks |
+  default(default_leapp_remediation_playbooks) }}"
+
+# remediation_todo is deprecated, use leapp_remediation_todo instead
+# leapp_remediation_todo: []
+leapp_remediation_todo: "{{ remediation_todo | default([]) }}"
+
+# leapp_remediate_ssh_password_auth
+# Whether to remediate SSH password authentication by setting PasswordAuthentication to no
+# and PermitRootLogin to prohibit-password
+# by default this is true, which is the old default
+leapp_remediate_ssh_password_auth: true
+
+# Set which Ansible Collection to use for System Roles.
+# For community/upstream, use 'fedora.linux_system_roles'.
+# For the RHEL, AAP, use 'redhat.rhel_system_roles'
+# infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_system_roles_collection instead
+# leapp_system_roles_collection: fedora.linux_system_roles
+leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
+...

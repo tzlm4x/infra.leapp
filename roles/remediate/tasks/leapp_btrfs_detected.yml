@@ -1,0 +1,57 @@
+---
+- name: leapp_btrfs_detected | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
+- name: leapp_btrfs_detected | Disable btrfs for the upgrade
+  vars:
+    leapp_inhibitor_keys:
+      - 196e2aadc90782f4de83cc0e1367c7a8dd211f3d
+    leapp_inhibitor_title: "Btrfs has been removed from RHEL8"
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    btrfs_mounts: "{{ ansible_facts.mounts
+      | selectattr('fstype', 'eq', 'btrfs')
+      | map(attribute='mount')
+      | list }}"
+  when: not leapp_report_missing | default(false)
+  block:
+    - name: leapp_btrfs_detected | End execution if no btrfs entry in leapp report
+      ansible.builtin.debug:
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: leapp_inhibitor_entries | length == 0
+
+    - name: leapp_btrfs_detected | Process remediation
+      when: leapp_inhibitor_entries | length > 0
+      block:
+        - name: leapp_btrfs_detected | Comment btrfs entries in /etc/fstab
+          ansible.builtin.replace:
+            path: /etc/fstab
+            regexp: '^([^#].*\sbtrfs\s.*)$'
+            replace: '# \1'
+
+        - name: leapp_btrfs_detected | Unmount btrfs filesystems
+          ansible.builtin.command: umount -l {{ item | quote }}
+          loop: "{{ btrfs_mounts }}"
+          when: btrfs_mounts | length > 0
+          changed_when: true
+
+        - name: leapp_btrfs_detected | Unload btrfs kernel module
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+            tasks_from: manage_kernel_modules.yml
+          vars:
+            leapp_kernel_modules:
+              - btrfs
+            leapp_kernel_modules_state: absent

@@ -1,0 +1,75 @@
+---
+- name: leapp_corrupted_grubenv_file | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
+- name: leapp_corrupted_grubenv_file | Detected a corrupted grubenv file
+  when: not leapp_report_missing | default(false)
+  vars:
+    leapp_inhibitor_keys:
+      - f32345b6140b5a318c1c01e1cbc6ef1c0321e04a
+    leapp_inhibitor_title: Detected a corrupted grubenv file
+    leapp_inhibitor_hint_pattern: Delete (.+?) file
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_remediation_matches: "{{ leapp_inhibitor_entries
+      | map(attribute='detail.remediations')
+      | flatten
+      | list }}"
+    leapp_inhibitor_remediation_hint: "{{ leapp_remediation_matches | selectattr('type', 'eq', 'hint') | first
+      if leapp_remediation_matches | length > 0 else {} }}"
+  block:
+    - name: leapp_corrupted_grubenv_file | End execution of playbook if no entry found in leapp report
+      ansible.builtin.debug:
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: leapp_inhibitor_remediation_hint | length == 0
+
+    - name: leapp_corrupted_grubenv_file | Process remediation
+      when: leapp_inhibitor_remediation_hint | length > 0
+      vars:
+        files_grub: >-
+          {{ (leapp_inhibitor_remediation_hint.context | regex_findall(leapp_inhibitor_hint_pattern, '\\1') | first).split(',')
+            | map('trim')
+            | list }}
+      block:
+        - name: leapp_corrupted_grubenv_file | Backup file(s)
+          ansible.builtin.copy:
+            src: "{{ item }}"
+            dest: "{{ item }}.backup"
+            mode: "0644"
+          with_items: "{{ files_grub }}"
+
+        - name: leapp_corrupted_grubenv_file | Find grub.cfg file
+          ansible.builtin.command: find /boot -name 'grub.cfg'
+          register: grub_cfg_path
+          changed_when: grub_cfg_path is success
+
+        - name: leapp_corrupted_grubenv_file | Backup grub.cfg file
+          ansible.builtin.copy:
+            src: "{{ grub_cfg_path.stdout }}"
+            dest: "{{ grub_cfg_path.stdout }}.backup"
+            mode: "0644"
+
+        - name: leapp_corrupted_grubenv_file | Delete file(s)
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          with_items: "{{ files_grub }}"
+
+        - name: leapp_corrupted_grubenv_file | Regenerate grub config
+          ansible.builtin.command: grub2-mkconfig -o {{ grub_cfg_path.stdout }}
+          register: grub_mkconfig
+          changed_when: grub_mkconfig is success
+
+...

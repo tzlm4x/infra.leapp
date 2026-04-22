@@ -1,0 +1,4 @@
+---
+# defaults file for common
+leapp_os_path: $PATH
+...

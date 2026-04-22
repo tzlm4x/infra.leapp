@@ -1,0 +1,20 @@
+---
+# handlers file for remedations
+
+# Keep this last so it's easy to find in the job output.
+- name: "Restart sshd"
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: The remediations are now complete
+  ansible.builtin.debug:
+    msg: The remediations are now complete.
+
+- name: Reboot the system
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
+
+...

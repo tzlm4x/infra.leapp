@@ -1,0 +1,51 @@
+---
+- name: leapp_multiple_devel_kernels_installed | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
+- name: leapp_multiple_devel_kernels_installed | Remove old kernel-devel packages
+  vars:
+    leapp_inhibitor_keys:
+      - 8ceea81afbbb1a329b7d82ca7212b21509e5b256
+    leapp_inhibitor_title: "Multiple devel kernels installed"
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+  when: not leapp_report_missing | default(false)
+  block:
+    - name: leapp_multiple_devel_kernels_installed | End execution if no entry found in leapp report
+      ansible.builtin.debug:
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: leapp_inhibitor_entries | length == 0
+
+    - name: leapp_multiple_devel_kernels_installed | Process remediation
+      when: leapp_inhibitor_entries | length > 0
+      block:
+        - name: leapp_multiple_devel_kernels_installed | Get list of installed kernel-devel packages sorted by newest version
+          ansible.builtin.shell: |
+            set -o pipefail
+            rpm -q kernel-devel --queryformat '%{name}-%{version}-%{release}.%{arch}\n' | sort -Vr
+          register: installed_kernel_devel
+          changed_when: false
+          failed_when: false
+
+        - name: leapp_multiple_devel_kernels_installed | Remove old kernel-devel packages
+          ansible.builtin.package:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ installed_kernel_devel.stdout_lines[1:] }}"
+          when: installed_kernel_devel.stdout_lines | length > 1
+
+        - name: leapp_multiple_devel_kernels_installed | Print installed kernel-devel packages
+          ansible.builtin.debug:
+            var: installed_kernel_devel.stdout_lines

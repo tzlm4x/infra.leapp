@@ -1,0 +1,82 @@
+---
+# vars file for common
+__leapp_common_required_facts:
+  - architecture
+  - date_time
+  - distribution
+  - distribution_version
+  - distribution_major_version
+  - pkg_mgr
+__leapp_common_required_facts_subsets: "{{ ['!all', '!min'] +
+  __leapp_common_required_facts }}"
+__leapp_preupg_return_codes:
+  0:
+    msg: "preupg works properly and modules exit with the following results: PASS, FIXED, INFORMATIONAL, NEEDS_INSPECTION, NOT_APPLICABLE."
+    fail: false
+    inhibited: false
+  1:
+    msg: preupg works properly but at least one module finishes with NEEDS_ACTION result.
+    fail: false
+    inhibited: false
+  2:
+    msg: preupg works properly but at least one module finishes with FAIL or ERROR result.
+    fail: false
+    inhibited: true
+  20:
+    msg: preupg cannot find a proper upgrade scenario.
+    fail: false
+    inhibited: true
+  21:
+    msg: preupg is executed with options --mode and --select-rules. This is not allowed.
+    fail: true
+    inhibited: true
+  22:
+    msg: preupg is executed with an invalid command line option.
+    fail: true
+    inhibited: true
+  23:
+    msg: preupg has to be executed as root.
+    fail: true
+    inhibited: true
+  24:
+    msg: System assessment has to be performed first before using --riskcheck option.
+    fail: true
+    inhibited: true
+  25:
+    msg: openscap and openscap-engine-sce are not installed on the system.
+    fail: true
+    inhibited: true
+  26:
+    msg: You specified a text converter which is not allowed. Allowed converters are w3m, lynx and elinks.
+    fail: true
+    inhibited: true
+  27:
+    msg: >-
+      The /usr/share/preupgrade/data/preassessment/scripts.txt file is missing. The Preupgrade Assistant is not
+      installed properly and needs to be reinstalled.
+    fail: true
+    inhibited: true
+  28:
+    msg: We have detected some troubles with sending the report to WEB-UI.
+    fail: true
+    inhibited: true
+  29:
+    msg: Internal problem.
+    fail: true
+    inhibited: true
+  30:
+    msg: User aborted the assessment.
+    fail: true
+    inhibited: true
+  127:
+    msg: preupg command not found.  Analysis must be run first.
+    fail: true
+    inhibited: true
+
+__leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo '))
+  if leapp_repos_enabled | length > 0 else '' }}"
+
+leapp_result_filename: "{{ '/root/preupgrade/result.txt' if ansible_facts['distribution_major_version'] == '6'
+  else '/var/log/leapp/leapp-report.txt' }}"
+
+...

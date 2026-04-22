@@ -1,0 +1,6 @@
+---
+# Set facts to make them available outside of the role and in handlers
+- name: Fail because role is used incorrectly
+  ansible.builtin.fail:
+    msg: "You must run the role with tasks_from: <task_file>.yml"
+...

@@ -1,0 +1,163 @@
+---
+- name: leapp_move_usr_directory | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing_6to7 | default(false)
+
+# This remediation is only necessary when upgrading from RHEL 6 to 7.
+- name: leapp_move_usr_directory | Move /usr to root partition if on another disk or partition.
+  vars:
+    entry_title: The /usr/ directory is located on a separate partition. The in-place upgrade is not possible.
+    entry_found: "{{ entry_title in (leapp_pre_upgrade_report_6to7.content | b64decode) }}"
+    usr_local_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/usr/local') | map(attribute='device') | d([''], true) | first }}"
+    usr_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/usr') | map(attribute='device') | d([''], true) | first }}"
+    root_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | map(attribute='device') | d([''], true) | first }}"
+  when:
+    - not leapp_report_missing_6to7 | default(false)
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 6
+  block:
+    - name: leapp_move_usr_directory | End execution of playbook if no entry found in leapp report
+      ansible.builtin.debug:
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: not entry_found | default(false)
+
+    - name: leapp_move_usr_directory | Fail if /usr is not on a separate filesystem
+      ansible.builtin.debug:
+        msg: "This playbook is designed for systems where /usr is mounted on a separate filesystem. /usr is not mounted separately."
+      when:
+        - entry_found
+        - usr_mount_source | length == 0
+
+    - name: leapp_move_usr_directory | Skip if /usr is already on root filesystem
+      ansible.builtin.debug:
+        msg: "/usr is already on root filesystem. Skipping this task."
+      when:
+        - entry_found
+        - usr_mount_source | length > 0
+        - usr_mount_source == root_mount_source
+
+    - name: leapp_move_usr_directory | Pre-move checks
+      when:
+        - entry_found
+        - usr_mount_source | length > 0
+        - usr_mount_source != root_mount_source
+      vars:
+        space_needed: "{{ usr_size | int + (usr_local_size | default(0) | int) }}"
+      block:
+        - name: leapp_move_usr_directory | Check available space on root filesystem
+          ansible.builtin.set_fact:
+            root_space: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_facts['mounts'] }}"
+          when: item.mount == '/'
+
+        - name: leapp_move_usr_directory | Get /usr size
+          ansible.builtin.set_fact:
+            usr_size: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_facts['mounts'] }}"
+          when: item.mount == '/usr'
+
+        - name: leapp_move_usr_directory | Get /usr/local size
+          ansible.builtin.set_fact:
+            usr_local_size: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_facts['mounts'] }}"
+          when: item.mount == '/usr/local' and usr_local_mount_source | length > 0
+
+        - name: leapp_move_usr_directory | Check if enough space on root filesystem
+          ansible.builtin.set_fact:
+            enough_space: "{{ space_needed | int <= root_space | int }}"
+
+        - name: leapp_move_usr_directory | Fail if not enough space on root filesystem
+          ansible.builtin.debug:
+            msg: "Not enough space on root filesystem. Need {{ space_needed | int / 1024 }} KB, have {{ root_space | int / 1024 }} KB"
+          when: not enough_space | default(false)
+
+    - name: leapp_move_usr_directory | Move the /usr directory
+      when: enough_space | default(false)
+      block:
+        - name: leapp_move_usr_directory | Ensure temporary mount directories exist
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: "0755"
+            owner: root
+            group: root
+          loop:
+            - /mnt/root
+            - /mnt/usr
+
+        - name: leapp_move_usr_directory | Ensure /mnt/usr/local directory exists if /usr/local is mounted
+          ansible.builtin.file:
+            path: /mnt/usr_local
+            state: directory
+            mode: "0755"
+            owner: root
+            group: root
+          when: usr_local_mount_source | length > 0
+
+        - name: leapp_move_usr_directory | Ensure bind mounts for /, /usr, and /usr/local exist
+          ansible.builtin.include_role:
+            name: "{{ leapp_system_roles_collection }}.storage"
+          vars:
+            storage_safe_mode: true
+            _volumes_base:
+              - name: leapp_bind_root_to_mnt_root
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/root
+                mount_options: bind
+                device: /
+              - name: leapp_bind_usr_to_mnt_usr
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/usr
+                mount_options: bind
+                device: /usr
+            _volumes_local:
+              - name: leapp_bind_usrlocal_to_mnt_usr_local
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/usr_local
+                mount_options: bind
+                device: /usr/local
+
+            storage_volumes: "{{ _volumes_base + (_volumes_local if (usr_local_mount_source | length > 0) else []) }}"
+
+        - name: leapp_move_usr_directory | Copy /usr to /mnt/root/usr
+          ansible.builtin.shell: |
+            set -o pipefail
+            rsync -aHAXv /mnt/usr/* /mnt/root/usr/
+          changed_when: true
+
+        - name: leapp_move_usr_directory | Copy /usr/local to /mnt/root/usr/local
+          ansible.builtin.shell: |
+            set -o pipefail
+            rsync -aHAXv /mnt/usr_local/* /mnt/root/usr/local/
+          when: usr_local_mount_source | length > 0
+          changed_when: true
+
+        - name: leapp_move_usr_directory | Ensure /usr line is removed from /etc/fstab
+          ansible.builtin.lineinfile:
+            path: /etc/fstab
+            regexp: "/usr "
+            state: absent
+
+        - name: leapp_move_usr_directory | Ensure /usr/local line is removed from /etc/fstab
+          ansible.builtin.lineinfile:
+            path: /etc/fstab
+            regexp: "/usr/local "
+            state: absent
+          when: usr_local_mount_source | length > 0
+
+        # TODO: Do we need to reboot the system here?  Or can we move this
+        # to a handler?  Do any subsequent tasks require access to /usr/local?
+        # If we do need to reboot here, we should 1) add a conditional so that we
+        # only reboot if necessary, and 2) check if the filesystems are mounted
+        - name: leapp_move_usr_directory | Reboot the system
+          ansible.builtin.reboot:
+            msg: "Rebooting the system to complete the move of /usr"
+            connect_timeout: "{{ leapp_reboot_timeout }}"
+            pre_reboot_delay: "{{ leapp_pre_reboot_delay }}"
+            post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+
+...

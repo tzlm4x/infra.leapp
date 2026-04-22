@@ -1,0 +1,18 @@
+---
+- name: Test
+  hosts: all
+  vars:
+    job_name: test_analysis
+  tasks:
+    - name: Test | Run analysis
+      block:
+        - name: Test | Run role analysis
+          ansible.builtin.include_role:
+            name: infra.leapp.analysis
+      always:
+        - name: Test | Include cleanup logs
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+            tasks_from: cleanup_logs.yml
+
+...
