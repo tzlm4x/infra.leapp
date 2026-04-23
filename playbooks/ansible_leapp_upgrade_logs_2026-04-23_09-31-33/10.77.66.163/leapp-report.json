@@ -1,0 +1,625 @@
+{
+  "entries": [
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "remediations": [
+          {
+            "context": "If some of excluded repositories are still required to be used during the upgrade, execute leapp with the --enablerepo option with the repoid of the repository required to be enabled as an argument (the option can be used multiple times).",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "1b9132cb2362ae7830e48eee7811be9527747de8",
+      "severity": "info",
+      "summary": "The following repositories are not supported by Red Hat and are excluded from the list of repositories used during the upgrade.\n- codeready-builder-beta-for-rhel-8-s390x-rpms\n- codeready-builder-beta-for-rhel-8-ppc64le-rpms\n- rhui-codeready-builder-for-rhel-8-x86_64-rhui-rpms\n- codeready-builder-for-rhel-8-aarch64-eus-rpms\n- codeready-builder-for-rhel-8-ppc64le-eus-rpms\n- codeready-builder-beta-for-rhel-8-x86_64-rpms\n- codeready-builder-for-rhel-8-aarch64-rpms\n- codeready-builder-for-rhel-8-s390x-rpms\n- codeready-builder-for-rhel-8-s390x-eus-rpms\n- codeready-builder-for-rhel-8-x86_64-eus-rpms\n- rhui-codeready-builder-for-rhel-8-aarch64-rhui-rpms\n- codeready-builder-beta-for-rhel-8-aarch64-rpms\n- codeready-builder-for-rhel-8-rhui-rpms\n- codeready-builder-for-rhel-8-x86_64-rhui-rpms\n- codeready-builder-for-rhel-8-x86_64-rpms\n- codeready-builder-for-rhel-8-x86_64-eus-rhui-rpms\n- codeready-builder-for-rhel-8-ppc64le-rpms",
+      "title": "Excluded target system repositories",
+      "timeStamp": "2026-04-23T09:36:57.676730Z",
+      "hostname": "localhost.localdomain",
+      "actor": "repositories_blacklist",
+      "id": "0ed9748e39a4e393337a803f604d021be27df63aabc7534eb540e07033837f6a",
+      "flags": [
+        "failure"
+      ],
+      "tags": [
+        "repository"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "libnsl2-devel"
+          },
+          {
+            "scheme": "package",
+            "title": "python3-pyxattr"
+          },
+          {
+            "scheme": "package",
+            "title": "rpcgen"
+          },
+          {
+            "scheme": "package",
+            "title": "rpcsvc-proto-devel"
+          }
+        ]
+      },
+      "key": "2437e204808f987477c0e9be8e4c95b3a87a9f3e",
+      "severity": "high",
+      "summary": "4 packages will be skipped because they are available only in target system repositories that are intentionally excluded from the list of repositories used during the upgrade. See the report message titled \"Excluded target system repositories\" for details.\nThe list of these packages:\n- libnsl2-devel (repoid: codeready-builder-for-rhel-8-x86_64-rpms)\n- python3-pyxattr (repoid: codeready-builder-for-rhel-8-x86_64-rpms)\n- rpcgen (repoid: codeready-builder-for-rhel-8-x86_64-rpms)\n- rpcsvc-proto-devel (repoid: codeready-builder-for-rhel-8-x86_64-rpms)",
+      "title": "Packages available in excluded repositories will not be installed",
+      "timeStamp": "2026-04-23T09:37:05.169461Z",
+      "hostname": "localhost.localdomain",
+      "actor": "pes_events_scanner",
+      "id": "cf0c02e69ae6fda3cad1413b330c81e64ffe057440f6efd7805bfe5366d60630",
+      "flags": [],
+      "tags": [
+        "repository"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "authselect"
+          },
+          {
+            "scheme": "package",
+            "title": "authconfig"
+          },
+          {
+            "scheme": "file",
+            "title": "/etc/nsswitch.conf"
+          }
+        ]
+      },
+      "key": "319689b95eb55badec00c29d53ee79534433cd7c",
+      "severity": "info",
+      "summary": "There is a new tool called authselect in RHEL8 that replaced authconfig. The upgrade process suggested an authselect profile that is similar to your current configuration and your system will be switched to this profile. Authselect call is: authselect select sssd with-fingerprint with-mkhomedir with-pamaccess with-sudo --force. The process will also enable \"oddjobd\" systemd service on startup",
+      "title": "Authselect will be used to configure PAM and nsswitch.conf.",
+      "timeStamp": "2026-04-23T09:37:05.501756Z",
+      "hostname": "localhost.localdomain",
+      "actor": "authselect_check",
+      "id": "7a050ecf50fbdca795814541b16578fecc5126afb50d43d932c855469f652369",
+      "flags": [],
+      "tags": [
+        "authentication",
+        "security",
+        "tools"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "grep"
+          }
+        ],
+        "remediations": [
+          {
+            "context": "Please update your scripts to be compatible with the changes.",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "94665a499e2eeee35eca3e7093a7abe183384b16",
+      "severity": "low",
+      "summary": "If a file contains data improperly encoded for the current locale, and this is discovered before any of the file's contents are output, grep now treats the file as binary.\nThe 'grep -P' no longer reports an error and exits when given invalid UTF-8 data. Instead, it considers the data to be non-matching.\nIn locales with multibyte character encodings other than UTF-8, grep -P now reports an error and exits instead of misbehaving.\nWhen searching binary data, grep now may treat non-text bytes as line terminators. This can boost performance significantly.\nThe 'grep -z' no longer automatically treats the byte '\\200' as binary data.\nContext no longer excludes selected lines omitted because of -m. For example, 'grep \"^\" -m1 -A1' now outputs the first two input lines, not just the first line.\n",
+      "title": "Grep has incompatible changes in the next major version",
+      "timeStamp": "2026-04-23T09:37:05.919941Z",
+      "hostname": "localhost.localdomain",
+      "actor": "checkgrep",
+      "id": "28894eee7bda73359ad4ee88983198d38830b99bf1b130be2a51bccc3f6b139d",
+      "flags": [],
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "ac7030e05d2ee248d34f08a9fa040b352bc410a3",
+      "severity": "high",
+      "summary": "On legacy (BIOS) systems, GRUB2 core (located in the gap between the MBR and the first partition) cannot be updated during the rpm transaction and Leapp has to initiate the update running \"grub2-install\" after the transaction. No action is needed before the upgrade. After the upgrade, it is recommended to check the GRUB configuration.",
+      "title": "GRUB2 core will be automatically updated during the upgrade",
+      "timeStamp": "2026-04-23T09:37:06.929172Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_grub_core",
+      "id": "211781c5b93e6125b5c89bae4d0b62ee433e74240c741f1c363e52d139cea060",
+      "flags": [],
+      "tags": [
+        "boot"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "13f0791ae5f19f50e7d0d606fb6501f91b1efb2c",
+      "severity": "high",
+      "summary": "The following packages have not been signed by Red Hat and may be removed during the upgrade process in case Red Hat-signed packages to be removed during the upgrade depend on them:\n- ansible\n- ccache\n- hiera\n- jq\n- libsodium\n- monit\n- oniguruma\n- openpgm\n- python-keyczar\n- python2-argcomplete\n- python2-backports-functools_lru_cache\n- python2-boto\n- python2-crypto\n- python2-distro\n- python2-future\n- python2-httplib2\n- python2-jmespath\n- python2-msgpack\n- python2-pip\n- python2-rsa\n- python2-six\n- python2-tracer\n- python2-zmq\n- rhn-org-trusted-ssl-cert\n- ruby-augeas\n- ruby-shadow\n- rubygem-rgen\n- salt\n- salt-minion\n- spacecmd\n- tracer-common\n- zabbix-agent\n- zabbix-get\n- zabbix-sender\n- zeromq\n- zeromq3",
+      "title": "Packages not signed by Red Hat found on the system",
+      "timeStamp": "2026-04-23T09:37:07.662862Z",
+      "hostname": "localhost.localdomain",
+      "actor": "red_hat_signed_rpm_check",
+      "id": "00c79b67a38d438d69e984fa152a0b89b16bbaa836bfe4087549250cd65e697d",
+      "flags": [],
+      "tags": [
+        "sanity"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "sssd"
+          },
+          {
+            "scheme": "file",
+            "title": "/etc/sssd/sssd.conf"
+          }
+        ],
+        "remediations": [
+          {
+            "context": "If you use sudo rules with wildcards, set this option to true explicitly.",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "567936c44117958cb457a8baa044481fa21d2ac0",
+      "severity": "high",
+      "summary": "Default value of ldap_sudo_include_regexp changed from true to false for performance reason.",
+      "title": "SSSD Domain \"default\": sudo rules containing wildcards will stop working.",
+      "timeStamp": "2026-04-23T09:37:07.950167Z",
+      "hostname": "localhost.localdomain",
+      "actor": "sssd_check",
+      "id": "14f8a454abad4f36b159758f3eebf5136c47d1b1232c8e8593fb40bcc59e2ff7",
+      "flags": [],
+      "tags": [
+        "authentication",
+        "security"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "postfix"
+          }
+        ]
+      },
+      "key": "5721e0a07a67d82cf7e5ea6f17662cd4f82e0a33",
+      "severity": "low",
+      "summary": "Postfix 3.x has so called \"compatibility safety net\" that runs Postfix programs with backwards-compatible default settings. It will log a warning whenever backwards-compatible default setting may be required for continuity of service. Based on this logging the system administrator can decide if any backwards-compatible settings need to be made permanent in main.cf or master.cf, before turning off the backwards-compatibility safety net.\nThe backward compatibility safety net is by default turned off in Red Hat Enterprise Linux 8.\nIt can be turned on by running:  \"postconf -e compatibility_level=0\nIt can be turned off by running: \"postconf -e compatibility_level=2\n\nIn the Postfix MySQL database client, the default \"option_group\" value has changed to \"client\", i.e. it now reads options from the [client] group from the MySQL configuration file. To disable it, set \"option_group\" to the empty string.\n\nThe postqueue command no longer forces all message arrival times to be reported in UTC. To get the old behavior, set TZ=UTC in main.cf:import_environment.\n\nPostfix 3.2 enables elliptic curve negotiation. This changes the default smtpd_tls_eecdh_grade setting to \"auto\", and introduces a new parameter \"tls_eecdh_auto_curves\" with the names of curves that may be negotiated.\n\nThe \"master.cf\" chroot default value has changed from \"y\" (yes) to \"n\" (no). This applies to master.cf services where chroot field is not explicitly specified.\n\nThe \"append_dot_mydomain\" default value has changed from \"yes\" to \"no\". You may need changing it to \"yes\" if senders cannot use complete domain names in e-mail addresses.\n\nThe \"relay_domains\" default value has changed from \"$mydestination\" to the empty value. This could result in unexpected \"Relay access denied\" errors or ETRN errors, because now will postfix by default relay only for the localhost.\n\nThe \"mynetworks_style\" default value has changed from \"subnet\" to \"host\". This parameter is used to implement the \"permit_mynetworks\" feature. The change could result in unexpected \"access denied\" errors, because postfix will now by default trust only the local machine, not the remote SMTP clients on the same IP subnetwork.\n\nPostfix now supports dynamically loaded database plugins. Plugins are shipped in individual RPM sub-packages. Correct database plugins have to be installed, otherwise the specific database client will not work. For example for PostgreSQL map to work, the postfix-pgsql RPM package has to be installed.\n",
+      "title": "Postfix has incompatible changes in the next major version",
+      "timeStamp": "2026-04-23T09:37:08.470750Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_postfix",
+      "id": "7f0b06a10e9623c414205344cb9cc842c4ce45d663d6c67b28223aaeb7797f38",
+      "flags": [],
+      "tags": [
+        "services",
+        "email"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "remediations": [
+          {
+            "context": "Remove the invalid symlinks before the upgrade.",
+            "type": "hint"
+          },
+          {
+            "context": [
+              "/usr/bin/rm",
+              "/etc/systemd/system/default.target"
+            ],
+            "type": "command"
+          }
+        ]
+      },
+      "key": "be2083fee03f5f0a708fd193d82d2fe20aee7217",
+      "severity": "low",
+      "summary": "Leapp detected broken systemd symlinks on the system that do not correspond to any installed systemd unit. This typically happens when the original systemd unit file has been removed (e.g. an rpm removal) or renamed and the system configration has not been properly modified. These symlinks will not be handled during the in-place upgrade as they are already broken. The list of detected broken systemd symlinks:\n    - /etc/systemd/system/default.target",
+      "title": "Detected broken systemd symlinks for non-existing services",
+      "timeStamp": "2026-04-23T09:37:08.893344Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_systemd_broken_symlinks",
+      "id": "b37d5311c32366880995aadec80b1e21722943d5dc3ddebc31e8b228af3a62db",
+      "flags": [],
+      "tags": [
+        "filesystem"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "5744a935aab15fe2386ea52849d21edd6525e4d7",
+      "severity": "low",
+      "summary": "OpenSSH is configured with removed configuration option Protocol. If this used to be for enabling SSHv1, this is no longer supported in RHEL 8. Otherwise this option can be simply removed.",
+      "title": "OpenSSH configured with removed configuration Protocol",
+      "timeStamp": "2026-04-23T09:37:08.967157Z",
+      "hostname": "localhost.localdomain",
+      "actor": "open_ssh_protocol",
+      "id": "e44eb8225de4dc5fd5930aa260f10db9d41571ac3b2d9a0f91caf0437d74b038",
+      "flags": [],
+      "tags": [
+        "authentication",
+        "security",
+        "network",
+        "services"
+      ]
+    },
+    {
+      "audience": "developer",
+      "detail": {
+        "external": [
+          {
+            "title": "Difference in Python versions and support in RHEL 8",
+            "url": "https://red.ht/rhel-8-python"
+          }
+        ],
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "python"
+          },
+          {
+            "scheme": "package",
+            "title": "python2"
+          },
+          {
+            "scheme": "package",
+            "title": "python3"
+          }
+        ],
+        "remediations": [
+          {
+            "context": "Please run \"alternatives --set python /usr/bin/python3\" after upgrade",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "0c98585b1d8d252eb540bf61560094f3495351f5",
+      "severity": "high",
+      "summary": "In RHEL 8, there is no 'python' command. Python 3 (backward incompatible) is the primary Python version and Python 2 is available with limited support and limited set of packages. If you no longer require Python 2 packages following the upgrade, please remove them. Read more here: https://red.ht/rhel-8-python",
+      "title": "Difference in Python versions and support in RHEL 8",
+      "timeStamp": "2026-04-23T09:37:09.039117Z",
+      "hostname": "localhost.localdomain",
+      "actor": "python_inform_user",
+      "id": "459107741cbfadea59a2df6a53fbf222d1c2ebd42e5df12340188acdea21d85a",
+      "flags": [],
+      "tags": [
+        "python"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "ntpd"
+          },
+          {
+            "scheme": "package",
+            "title": "chrony"
+          },
+          {
+            "scheme": "file",
+            "title": "/etc/chrony.conf"
+          }
+        ]
+      },
+      "key": "9acbfcce3d310a70b602c7ab0a9c2cb94eb6b63f",
+      "severity": "low",
+      "summary": "chrony behavior will not change in RHEL8",
+      "title": "chrony using non-default configuration",
+      "timeStamp": "2026-04-23T09:37:10.605521Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_chrony",
+      "id": "a353259d821a1017fbbc8c388abd9409a898a4cbb1a1a2db20b6a05216602c0e",
+      "flags": [],
+      "tags": [
+        "services",
+        "time management"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "0ff2413fd3cb0358736bf9be597f4dbdf58f2c4d",
+      "severity": "high",
+      "summary": "The following RHEL 7 device drivers are no longer maintained RHEL 8:\n     - mptspi\n     - mptscsih\n     - mptbase\n     - mptspi\n",
+      "title": "Leapp detected loaded kernel drivers which are no longer maintained in RHEL 8.",
+      "timeStamp": "2026-04-23T09:37:10.827348Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_detected_devices_and_drivers",
+      "id": "dfe06fd915cc1b3e2067d91591f228e9940227872d25f6e509c2ee5d49d86347",
+      "flags": [],
+      "tags": [
+        "kernel",
+        "drivers"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "sssd"
+          }
+        ],
+        "remediations": [
+          {
+            "context": "Configure SSSD to replace pam_pkcs11",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "bf47e7305d6805e8bbeaa7593cf01e38030c23f3",
+      "severity": "medium",
+      "summary": "Module pam_pkcs11 was surpassed by SSSD and therefore it was removed from RHEL-8. Keeping it in PAM configuration may lock out the system thus it will be automatically removed from PAM configuration before upgrading to RHEL-8. Please switch to SSSD to recover the functionality of pam_pkcs11.",
+      "title": "Module pam_pkcs11 will be removed from PAM configuration",
+      "timeStamp": "2026-04-23T09:37:10.984783Z",
+      "hostname": "localhost.localdomain",
+      "actor": "removed_pam_modules_check",
+      "id": "13c0befb3937de57adc7c3b2631870a85303afb7dcee73ad2a965b6d2822dfb4",
+      "flags": [],
+      "tags": [
+        "authentication",
+        "security",
+        "tools"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "693963253195f418526f045b6d630a1f4c7a193d",
+      "severity": "info",
+      "summary": "After the upgrade, this system will be automatically registered into Red Hat Insights. The 'insights-client' package required for the registration will be installed during the upgrade. To skip the automatic registration, use the '--no-insights-register' command line option or set the LEAPP_NO_INSIGHTS_REGISTER environment variable.",
+      "title": "Automatic registration into Red Hat Insights",
+      "timeStamp": "2026-04-23T09:37:12.273866Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_insights_auto_register",
+      "id": "15aed26b07312fc6130b2cea973c8dad00f3df152a25954a0510ae325c955f97",
+      "flags": [],
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "4f25fea9b15b9d1d07d52cc1de02073f295dac3d",
+      "severity": "info",
+      "summary": "SElinux disabled, continuing...",
+      "title": "SElinux disabled",
+      "timeStamp": "2026-04-23T09:37:12.854267Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_se_linux",
+      "id": "531f8c2e284b789682cd58fa8e190f03546e73cffcfbf6a97b6b170e538d4baf",
+      "flags": [],
+      "tags": [
+        "selinux",
+        "security"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "remediations": [
+          {
+            "context": "To restore original files reinstall related packages.",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "5532a4fe27dc0b05de1e9e77bda407ea47ad6971",
+      "severity": "high",
+      "summary": "We have detected that some files of the tooling processing the in-place upgrade have been modified. Note that such modifications can be allowed only after consultation with Red Hat - e.g. when support suggests the change to resolve discovered problem. If these changes have not been approved by Red Hat, the in-place upgrade is unsupported.\nFollowing files have been modified:\n    - /var/log/leapp",
+      "title": "Detected modified files of the in-place upgrade tooling.",
+      "timeStamp": "2026-04-23T09:37:13.300869Z",
+      "hostname": "localhost.localdomain",
+      "actor": "check_custom_modifications_actor",
+      "id": "4c4e2f7c2df3dc4393ad37069bfdd0d325161c096a944da70cec3e96dd584ae1",
+      "flags": [],
+      "tags": [
+        "upgrade process"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "subscription-manager"
+          }
+        ],
+        "remediations": [
+          {
+            "context": "If you wish to receive updates for the latest released version of the target system, run `subscription-manager release --unset` after the upgrade.",
+            "type": "hint"
+          }
+        ]
+      },
+      "key": "747a4ca25303eda17d1891bb85eeb226be14f252",
+      "severity": "low",
+      "summary": "After the upgrade has completed the release of the subscription-manager will be set to 8.10. This will ensure that you will receive and keep the version you choose to upgrade to.",
+      "title": "The subscription-manager release is going to be set after the upgrade",
+      "timeStamp": "2026-04-23T09:39:56.584985Z",
+      "hostname": "localhost.localdomain",
+      "actor": "report_set_target_release",
+      "id": "3f08b42f281d9898765f31efca4d6694f6697b13b1c37d9106d9fe30fd4ed619",
+      "flags": [],
+      "tags": [
+        "upgrade process"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "8e10774a3c44f221dfacf6bac184356b233872d0",
+      "severity": "info",
+      "summary": "GRUB core on /dev/sda was successfully updated",
+      "title": "GRUB core successfully updated",
+      "timeStamp": "2026-04-23T09:57:50.246826Z",
+      "hostname": "localhost.localdomain",
+      "actor": "update_grub_core",
+      "id": "2715625e3f41776431b7fe6029ffa0d4f6e2f7bf608190a2322e76758f2b6da8",
+      "flags": [],
+      "tags": [
+        "boot"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "rh-python38-python-pip-wheel"
+          },
+          {
+            "scheme": "package",
+            "title": "ustr"
+          },
+          {
+            "scheme": "package",
+            "title": "libtomcrypt"
+          },
+          {
+            "scheme": "package",
+            "title": "python2-psutil"
+          },
+          {
+            "scheme": "package",
+            "title": "rh-python38-python-setuptools-wheel"
+          },
+          {
+            "scheme": "package",
+            "title": "libtommath"
+          },
+          {
+            "scheme": "package",
+            "title": "kernel"
+          },
+          {
+            "scheme": "package",
+            "title": "puppet-agent"
+          },
+          {
+            "scheme": "package",
+            "title": "kernel"
+          },
+          {
+            "scheme": "package",
+            "title": "leapp-upgrade-el7toel8"
+          },
+          {
+            "scheme": "package",
+            "title": "rh-python38-runtime"
+          }
+        ]
+      },
+      "key": "dc7229d4c442eeaa872ef37c9703976de9f2ccfc",
+      "severity": "high",
+      "summary": "Following RHEL 7 packages have not been upgraded:\nrh-python38-python-pip-wheel-19.3.1-4.el7\nustr-1.0.4-16.el7\nlibtomcrypt-1.17-26.el7\npython2-psutil-5.7.2-2.el7sat\nrh-python38-python-setuptools-wheel-41.6.0-8.el7\nlibtommath-0.42.0-6.el7\nkernel-3.10.0-1160.144.1.el7\npuppet-agent-7.28.0-1.el7sat\nkernel-3.10.0-1160.139.1.el7\nleapp-upgrade-el7toel8-0.20.0-13.el7_9\nrh-python38-runtime-2.0-4.el7\nPlease remove these packages to keep your system in supported state.\n",
+      "title": "Some RHEL 7 packages have not been upgraded",
+      "timeStamp": "2026-04-23T09:58:23.365228Z",
+      "hostname": "localhost.localdomain",
+      "actor": "report_leftover_packages",
+      "id": "bc24b963fd551bc0a9bbd3392b21321071890e2fb803cc36a9f7137157771421",
+      "flags": [],
+      "tags": [
+        "sanity"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "package",
+            "title": "authselect"
+          },
+          {
+            "scheme": "package",
+            "title": "authconfig"
+          },
+          {
+            "scheme": "file",
+            "title": "/etc/nsswitch.conf"
+          }
+        ]
+      },
+      "key": "57f4c92acfba4452d1f60248d4c6a03b04a53234",
+      "severity": "info",
+      "summary": "System was converted to authselect with the following call: \"authselect select --force sssd with-fingerprint with-mkhomedir with-pamaccess with-sudo\"",
+      "title": "System was converted to authselect.",
+      "timeStamp": "2026-04-23T09:58:54.848622Z",
+      "hostname": "localhost.localdomain",
+      "actor": "authselect_apply",
+      "id": "8e50eb617f42edecef48e7f95b767564b10da885f109f389556a166074d819bb",
+      "flags": [],
+      "tags": [
+        "authentication",
+        "security",
+        "tools"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "detail": {
+        "related_resources": [
+          {
+            "scheme": "file",
+            "title": "/etc/systemd/system/leapp_resume.service"
+          },
+          {
+            "scheme": "file",
+            "title": "/etc/systemd/system/default.target.wants/leapp_resume.service"
+          },
+          {
+            "scheme": "service",
+            "title": "leapp_resume.service"
+          }
+        ]
+      },
+      "key": "1b1583aaca45c500e78d18b5c0f2066cb1a2bc4c",
+      "severity": "info",
+      "summary": "leapp_resume.service enabled as oneshot systemd service to resume Leapp execution after reboot.",
+      "title": "Leapp resume systemd service enabled",
+      "timeStamp": "2026-04-23T09:58:58.494584Z",
+      "hostname": "localhost.localdomain",
+      "actor": "create_systemd_service",
+      "id": "844bf9d28b8c6e2fb1f8621f1d42eccadea6454ac5a7c09af41aa09cd14f7bde",
+      "flags": [],
+      "tags": [
+        "upgrade process"
+      ]
+    },
+    {
+      "audience": "sysadmin",
+      "key": "47ca952fd7eb5b1844a9a58b41003daf349cee74",
+      "severity": "info",
+      "summary": "\"leapp_resume.service\" was taking care of resuming upgrade process after the first reboot.",
+      "title": "\"leapp_resume.service\" service deleted",
+      "timeStamp": "2026-04-23T10:01:26.742973Z",
+      "hostname": "localhost.localdomain",
+      "actor": "remove_systemd_resume_service",
+      "id": "53a429aa9f4133c3044d31269aeb78f4d8d1c89c0803480073702b29acdd1656",
+      "flags": [],
+      "tags": [
+        "upgrade process"
+      ]
+    }
+  ],
+  "leapp_run_id": "2fee849a-c021-4c5a-9973-1c3d6fe05733"
+}

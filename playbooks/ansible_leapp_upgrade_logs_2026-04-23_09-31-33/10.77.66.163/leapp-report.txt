@@ -1,0 +1,231 @@
+Risk Factor: high 
+Title: Packages available in excluded repositories will not be installed
+Summary: 4 packages will be skipped because they are available only in target system repositories that are intentionally excluded from the list of repositories used during the upgrade. See the report message titled "Excluded target system repositories" for details.
+The list of these packages:
+- libnsl2-devel (repoid: codeready-builder-for-rhel-8-x86_64-rpms)
+- python3-pyxattr (repoid: codeready-builder-for-rhel-8-x86_64-rpms)
+- rpcgen (repoid: codeready-builder-for-rhel-8-x86_64-rpms)
+- rpcsvc-proto-devel (repoid: codeready-builder-for-rhel-8-x86_64-rpms)
+Key: 2437e204808f987477c0e9be8e4c95b3a87a9f3e
+----------------------------------------
+Risk Factor: high 
+Title: GRUB2 core will be automatically updated during the upgrade
+Summary: On legacy (BIOS) systems, GRUB2 core (located in the gap between the MBR and the first partition) cannot be updated during the rpm transaction and Leapp has to initiate the update running "grub2-install" after the transaction. No action is needed before the upgrade. After the upgrade, it is recommended to check the GRUB configuration.
+Key: ac7030e05d2ee248d34f08a9fa040b352bc410a3
+----------------------------------------
+Risk Factor: high 
+Title: Packages not signed by Red Hat found on the system
+Summary: The following packages have not been signed by Red Hat and may be removed during the upgrade process in case Red Hat-signed packages to be removed during the upgrade depend on them:
+- ansible
+- ccache
+- hiera
+- jq
+- libsodium
+- monit
+- oniguruma
+- openpgm
+- python-keyczar
+- python2-argcomplete
+- python2-backports-functools_lru_cache
+- python2-boto
+- python2-crypto
+- python2-distro
+- python2-future
+- python2-httplib2
+- python2-jmespath
+- python2-msgpack
+- python2-pip
+- python2-rsa
+- python2-six
+- python2-tracer
+- python2-zmq
+- rhn-org-trusted-ssl-cert
+- ruby-augeas
+- ruby-shadow
+- rubygem-rgen
+- salt
+- salt-minion
+- spacecmd
+- tracer-common
+- zabbix-agent
+- zabbix-get
+- zabbix-sender
+- zeromq
+- zeromq3
+Key: 13f0791ae5f19f50e7d0d606fb6501f91b1efb2c
+----------------------------------------
+Risk Factor: high 
+Title: SSSD Domain "default": sudo rules containing wildcards will stop working.
+Summary: Default value of ldap_sudo_include_regexp changed from true to false for performance reason.
+Remediation: [hint] If you use sudo rules with wildcards, set this option to true explicitly.
+Key: 567936c44117958cb457a8baa044481fa21d2ac0
+----------------------------------------
+Risk Factor: high 
+Title: Difference in Python versions and support in RHEL 8
+Summary: In RHEL 8, there is no 'python' command. Python 3 (backward incompatible) is the primary Python version and Python 2 is available with limited support and limited set of packages. If you no longer require Python 2 packages following the upgrade, please remove them. Read more here: https://red.ht/rhel-8-python
+Related links:
+    - Difference in Python versions and support in RHEL 8: https://red.ht/rhel-8-python
+Remediation: [hint] Please run "alternatives --set python /usr/bin/python3" after upgrade
+Key: 0c98585b1d8d252eb540bf61560094f3495351f5
+----------------------------------------
+Risk Factor: high 
+Title: Leapp detected loaded kernel drivers which are no longer maintained in RHEL 8.
+Summary: The following RHEL 7 device drivers are no longer maintained RHEL 8:
+     - mptspi
+     - mptscsih
+     - mptbase
+     - mptspi
+
+Key: 0ff2413fd3cb0358736bf9be597f4dbdf58f2c4d
+----------------------------------------
+Risk Factor: high 
+Title: Detected modified files of the in-place upgrade tooling.
+Summary: We have detected that some files of the tooling processing the in-place upgrade have been modified. Note that such modifications can be allowed only after consultation with Red Hat - e.g. when support suggests the change to resolve discovered problem. If these changes have not been approved by Red Hat, the in-place upgrade is unsupported.
+Following files have been modified:
+    - /var/log/leapp
+Remediation: [hint] To restore original files reinstall related packages.
+Key: 5532a4fe27dc0b05de1e9e77bda407ea47ad6971
+----------------------------------------
+Risk Factor: high 
+Title: Some RHEL 7 packages have not been upgraded
+Summary: Following RHEL 7 packages have not been upgraded:
+rh-python38-python-pip-wheel-19.3.1-4.el7
+ustr-1.0.4-16.el7
+libtomcrypt-1.17-26.el7
+python2-psutil-5.7.2-2.el7sat
+rh-python38-python-setuptools-wheel-41.6.0-8.el7
+libtommath-0.42.0-6.el7
+kernel-3.10.0-1160.144.1.el7
+puppet-agent-7.28.0-1.el7sat
+kernel-3.10.0-1160.139.1.el7
+leapp-upgrade-el7toel8-0.20.0-13.el7_9
+rh-python38-runtime-2.0-4.el7
+Please remove these packages to keep your system in supported state.
+
+Key: dc7229d4c442eeaa872ef37c9703976de9f2ccfc
+----------------------------------------
+Risk Factor: medium 
+Title: Module pam_pkcs11 will be removed from PAM configuration
+Summary: Module pam_pkcs11 was surpassed by SSSD and therefore it was removed from RHEL-8. Keeping it in PAM configuration may lock out the system thus it will be automatically removed from PAM configuration before upgrading to RHEL-8. Please switch to SSSD to recover the functionality of pam_pkcs11.
+Remediation: [hint] Configure SSSD to replace pam_pkcs11
+Key: bf47e7305d6805e8bbeaa7593cf01e38030c23f3
+----------------------------------------
+Risk Factor: low 
+Title: Grep has incompatible changes in the next major version
+Summary: If a file contains data improperly encoded for the current locale, and this is discovered before any of the file's contents are output, grep now treats the file as binary.
+The 'grep -P' no longer reports an error and exits when given invalid UTF-8 data. Instead, it considers the data to be non-matching.
+In locales with multibyte character encodings other than UTF-8, grep -P now reports an error and exits instead of misbehaving.
+When searching binary data, grep now may treat non-text bytes as line terminators. This can boost performance significantly.
+The 'grep -z' no longer automatically treats the byte '\200' as binary data.
+Context no longer excludes selected lines omitted because of -m. For example, 'grep "^" -m1 -A1' now outputs the first two input lines, not just the first line.
+
+Remediation: [hint] Please update your scripts to be compatible with the changes.
+Key: 94665a499e2eeee35eca3e7093a7abe183384b16
+----------------------------------------
+Risk Factor: low 
+Title: Postfix has incompatible changes in the next major version
+Summary: Postfix 3.x has so called "compatibility safety net" that runs Postfix programs with backwards-compatible default settings. It will log a warning whenever backwards-compatible default setting may be required for continuity of service. Based on this logging the system administrator can decide if any backwards-compatible settings need to be made permanent in main.cf or master.cf, before turning off the backwards-compatibility safety net.
+The backward compatibility safety net is by default turned off in Red Hat Enterprise Linux 8.
+It can be turned on by running:  "postconf -e compatibility_level=0
+It can be turned off by running: "postconf -e compatibility_level=2
+
+In the Postfix MySQL database client, the default "option_group" value has changed to "client", i.e. it now reads options from the [client] group from the MySQL configuration file. To disable it, set "option_group" to the empty string.
+
+The postqueue command no longer forces all message arrival times to be reported in UTC. To get the old behavior, set TZ=UTC in main.cf:import_environment.
+
+Postfix 3.2 enables elliptic curve negotiation. This changes the default smtpd_tls_eecdh_grade setting to "auto", and introduces a new parameter "tls_eecdh_auto_curves" with the names of curves that may be negotiated.
+
+The "master.cf" chroot default value has changed from "y" (yes) to "n" (no). This applies to master.cf services where chroot field is not explicitly specified.
+
+The "append_dot_mydomain" default value has changed from "yes" to "no". You may need changing it to "yes" if senders cannot use complete domain names in e-mail addresses.
+
+The "relay_domains" default value has changed from "$mydestination" to the empty value. This could result in unexpected "Relay access denied" errors or ETRN errors, because now will postfix by default relay only for the localhost.
+
+The "mynetworks_style" default value has changed from "subnet" to "host". This parameter is used to implement the "permit_mynetworks" feature. The change could result in unexpected "access denied" errors, because postfix will now by default trust only the local machine, not the remote SMTP clients on the same IP subnetwork.
+
+Postfix now supports dynamically loaded database plugins. Plugins are shipped in individual RPM sub-packages. Correct database plugins have to be installed, otherwise the specific database client will not work. For example for PostgreSQL map to work, the postfix-pgsql RPM package has to be installed.
+
+Key: 5721e0a07a67d82cf7e5ea6f17662cd4f82e0a33
+----------------------------------------
+Risk Factor: low 
+Title: Detected broken systemd symlinks for non-existing services
+Summary: Leapp detected broken systemd symlinks on the system that do not correspond to any installed systemd unit. This typically happens when the original systemd unit file has been removed (e.g. an rpm removal) or renamed and the system configration has not been properly modified. These symlinks will not be handled during the in-place upgrade as they are already broken. The list of detected broken systemd symlinks:
+    - /etc/systemd/system/default.target
+Remediation: [hint] Remove the invalid symlinks before the upgrade.
+[command] /usr/bin/rm /etc/systemd/system/default.target
+Key: be2083fee03f5f0a708fd193d82d2fe20aee7217
+----------------------------------------
+Risk Factor: low 
+Title: OpenSSH configured with removed configuration Protocol
+Summary: OpenSSH is configured with removed configuration option Protocol. If this used to be for enabling SSHv1, this is no longer supported in RHEL 8. Otherwise this option can be simply removed.
+Key: 5744a935aab15fe2386ea52849d21edd6525e4d7
+----------------------------------------
+Risk Factor: low 
+Title: chrony using non-default configuration
+Summary: chrony behavior will not change in RHEL8
+Key: 9acbfcce3d310a70b602c7ab0a9c2cb94eb6b63f
+----------------------------------------
+Risk Factor: low 
+Title: The subscription-manager release is going to be set after the upgrade
+Summary: After the upgrade has completed the release of the subscription-manager will be set to 8.10. This will ensure that you will receive and keep the version you choose to upgrade to.
+Remediation: [hint] If you wish to receive updates for the latest released version of the target system, run `subscription-manager release --unset` after the upgrade.
+Key: 747a4ca25303eda17d1891bb85eeb226be14f252
+----------------------------------------
+Risk Factor: info 
+Title: Excluded target system repositories
+Summary: The following repositories are not supported by Red Hat and are excluded from the list of repositories used during the upgrade.
+- codeready-builder-beta-for-rhel-8-s390x-rpms
+- codeready-builder-beta-for-rhel-8-ppc64le-rpms
+- rhui-codeready-builder-for-rhel-8-x86_64-rhui-rpms
+- codeready-builder-for-rhel-8-aarch64-eus-rpms
+- codeready-builder-for-rhel-8-ppc64le-eus-rpms
+- codeready-builder-beta-for-rhel-8-x86_64-rpms
+- codeready-builder-for-rhel-8-aarch64-rpms
+- codeready-builder-for-rhel-8-s390x-rpms
+- codeready-builder-for-rhel-8-s390x-eus-rpms
+- codeready-builder-for-rhel-8-x86_64-eus-rpms
+- rhui-codeready-builder-for-rhel-8-aarch64-rhui-rpms
+- codeready-builder-beta-for-rhel-8-aarch64-rpms
+- codeready-builder-for-rhel-8-rhui-rpms
+- codeready-builder-for-rhel-8-x86_64-rhui-rpms
+- codeready-builder-for-rhel-8-x86_64-rpms
+- codeready-builder-for-rhel-8-x86_64-eus-rhui-rpms
+- codeready-builder-for-rhel-8-ppc64le-rpms
+Remediation: [hint] If some of excluded repositories are still required to be used during the upgrade, execute leapp with the --enablerepo option with the repoid of the repository required to be enabled as an argument (the option can be used multiple times).
+Key: 1b9132cb2362ae7830e48eee7811be9527747de8
+----------------------------------------
+Risk Factor: info 
+Title: Authselect will be used to configure PAM and nsswitch.conf.
+Summary: There is a new tool called authselect in RHEL8 that replaced authconfig. The upgrade process suggested an authselect profile that is similar to your current configuration and your system will be switched to this profile. Authselect call is: authselect select sssd with-fingerprint with-mkhomedir with-pamaccess with-sudo --force. The process will also enable "oddjobd" systemd service on startup
+Key: 319689b95eb55badec00c29d53ee79534433cd7c
+----------------------------------------
+Risk Factor: info 
+Title: Automatic registration into Red Hat Insights
+Summary: After the upgrade, this system will be automatically registered into Red Hat Insights. The 'insights-client' package required for the registration will be installed during the upgrade. To skip the automatic registration, use the '--no-insights-register' command line option or set the LEAPP_NO_INSIGHTS_REGISTER environment variable.
+Key: 693963253195f418526f045b6d630a1f4c7a193d
+----------------------------------------
+Risk Factor: info 
+Title: SElinux disabled
+Summary: SElinux disabled, continuing...
+Key: 4f25fea9b15b9d1d07d52cc1de02073f295dac3d
+----------------------------------------
+Risk Factor: info 
+Title: GRUB core successfully updated
+Summary: GRUB core on /dev/sda was successfully updated
+Key: 8e10774a3c44f221dfacf6bac184356b233872d0
+----------------------------------------
+Risk Factor: info 
+Title: System was converted to authselect.
+Summary: System was converted to authselect with the following call: "authselect select --force sssd with-fingerprint with-mkhomedir with-pamaccess with-sudo"
+Key: 57f4c92acfba4452d1f60248d4c6a03b04a53234
+----------------------------------------
+Risk Factor: info 
+Title: Leapp resume systemd service enabled
+Summary: leapp_resume.service enabled as oneshot systemd service to resume Leapp execution after reboot.
+Key: 1b1583aaca45c500e78d18b5c0f2066cb1a2bc4c
+----------------------------------------
+Risk Factor: info 
+Title: "leapp_resume.service" service deleted
+Summary: "leapp_resume.service" was taking care of resuming upgrade process after the first reboot.
+Key: 47ca952fd7eb5b1844a9a58b41003daf349cee74
+----------------------------------------

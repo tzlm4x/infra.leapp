@@ -1,6 +1,6 @@
 ---
 - name: Remediate
-  hosts: rhel7
+  hosts: all
   become: true
   tasks:
     - name: Perform remediations on the system
