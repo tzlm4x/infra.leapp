@@ -8,6 +8,28 @@
     __leapp_role_required_facts: "{{ __leapp_remediate_required_facts }}"
     __leapp_role_required_facts_subsets: "{{ __leapp_remediate_required_facts_subsets }}"
 
+- name: Check if sssd.conf exists
+  ansible.builtin.stat:
+    path: /etc/sssd/sssd.conf
+  register: __leapp_sssd_conf_stat
+
+- name: Ensure required SSSD configuration
+  when: __leapp_sssd_conf_stat.stat.exists
+  block:
+    - name: Inserisco configurazioni necessarie in sssd.conf (1/2)
+      ansible.builtin.lineinfile:
+        path: /etc/sssd/sssd.conf
+        regexp: '^ldap_id_use_start_tls = true'
+        line: ldap_id_use_start_tls = true
+        insertafter: '^\[domain/default\]'
+
+    - name: Inserisco configurazioni necessarie in sssd.conf (2/2)
+      ansible.builtin.lineinfile:
+        path: /etc/sssd/sssd.conf
+        regexp: '^ldap_tls_reqcert = allow'
+        line: ldap_tls_reqcert = allow
+        insertafter: '^\[domain/default\]'
+
 - name: Run remediations
   vars:
     leapp_report_location_6to7: /root/preupgrade/result.txt
