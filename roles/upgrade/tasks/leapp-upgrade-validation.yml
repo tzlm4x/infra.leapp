@@ -12,14 +12,37 @@
   ansible.builtin.set_fact:
     leapp_upgrade_success: >-
       {{
-      (migration_results_json.activities |
+      ((migration_results_json.activities |
       selectattr('activity', 'match', 'upgrade') |
       selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + ansible_facts['distribution_major_version']) |
-      selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot') | list | first).success
+      selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot') | list | first |
+      default({'success': false}, true)).success | bool)
       }}
+
+- name: leapp-upgrade-validation | Extract FirstBoot activity details
+  ansible.builtin.set_fact:
+    leapp_firstboot_activities: >-
+      {{ migration_results_json.activities |
+         selectattr('activity', 'match', 'upgrade') |
+         selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + ansible_facts['distribution_major_version']) |
+         selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot') | list }}
+    leapp_all_activities_summary: >-
+      {{ migration_results_json.activities |
+         map(attribute='activity') | list | unique | join(', ') }}
+    leapp_all_phases_summary: >-
+      {{ migration_results_json.activities |
+         selectattr('env', 'defined') |
+         map(attribute='env') |
+         selectattr('LEAPP_CURRENT_PHASE', 'defined') |
+         map(attribute='LEAPP_CURRENT_PHASE') | list | unique | join(', ') }}
 
 - name: leapp-upgrade-validation | Ensure that Leapp upgrade FirstBoot was successful
   ansible.builtin.assert:
     that: leapp_upgrade_success
-    msg: Leapp upgrade FirstBoot failed.
+    msg: >
+      Leapp upgrade FirstBoot failed (or no FirstBoot entry was found).
+      Activities found in /etc/migration-results: [{{ leapp_all_activities_summary }}].
+      Phases found: [{{ leapp_all_phases_summary }}].
+      FirstBoot activities matched: {{ leapp_firstboot_activities | length }}.
+      Full migration-results content: {{ migration_results_json | to_nice_json }}.
 ...

@@ -19,7 +19,6 @@
     leapp_answerfile: |
       [remove_pam_pkcs11_module_check]
       confirm = True
-    leapp_answerfile: |
       [authselect_check]
       confirm = True
   tasks:

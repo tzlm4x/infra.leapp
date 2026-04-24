@@ -1,6 +1,6 @@
 ---
 # defaults file for upgrade
-leapp_upgrade_type: cdn
+leapp_upgrade_type: satellite
 # leapp_upgrade_type: satellite
 # leapp_upgrade_type: rhui
 # leapp_upgrade_type: custom
@@ -215,8 +215,8 @@ leapp_post_upgrade_python_interpreter: >-
 leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
 
 # remove_old_rhel_packages is deprecated, use leapp_remove_old_rhel_packages instead
-# leapp_remove_old_rhel_packages: true
-leapp_remove_old_rhel_packages: "{{ remove_old_rhel_packages | default(true) }}"
+leapp_remove_old_rhel_packages: false
+###leapp_remove_old_rhel_packages: "{{ remove_old_rhel_packages | default(true) }}"
 
 # Directory to store leapp pre-upgrade reports and remediation hostvars
 leapp_workdir_controller: "{{ playbook_dir }}"

@@ -11,7 +11,7 @@
       vars:
         settings:
           - {key: "PermitRootLogin", value: "prohibit-password"}
-          - {key: "PasswordAuthentication", value: "no"}
+         #- {key: "PasswordAuthentication", value: "no"}
       notify:
         - Restart sshd
 
